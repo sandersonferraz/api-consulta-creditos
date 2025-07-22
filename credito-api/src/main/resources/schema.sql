@@ -13,3 +13,12 @@ CREATE TABLE IF NOT EXISTS credito (
     base_calculo NUMERIC(15, 2) NOT NULL,
     created_at TIMESTAMP
 );
+
+DROP TABLE IF EXISTS credito_audit_log;
+
+CREATE TABLE IF NOT EXISTS credito_audit_log (
+    id BIGSERIAL PRIMARY KEY,
+    numero_credito VARCHAR(50),
+    numero_nfse VARCHAR(50),
+    consulted_at TIMESTAMP
+);
