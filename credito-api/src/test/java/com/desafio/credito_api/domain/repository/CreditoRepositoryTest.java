@@ -70,6 +70,7 @@ public class CreditoRepositoryTest {
         assertThat(output.getFirst().getValorDeducao()).isEqualTo(new BigDecimal("5000.00"));
         assertThat(output.getFirst().getBaseCalculo()).isEqualTo(new BigDecimal("25000.00"));
 
+
         assertThat(output.getLast().getNumeroCredito()).isEqualTo("789012");
         assertThat(output.getLast().getNumeroNfse()).isEqualTo("7891011");
         assertThat(output.getLast().getTipoCredito()).isEqualTo("ISSQN");
