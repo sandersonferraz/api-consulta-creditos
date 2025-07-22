@@ -4,6 +4,7 @@ import com.desafio.credito_api.application.usecase.BuscarCreditosPorNumeroNfseUs
 import com.desafio.credito_api.domain.model.Credito;
 import com.desafio.credito_api.infrastructure.repository.CreditoRepository;
 import com.desafio.credito_api.web.dto.CreditoResponseDTO;
+import com.desafio.credito_api.web.exception.NotFoundException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -97,7 +98,7 @@ public class BuscarCreditosPorNumeroNfseUseCaseTest {
         String input = "7891011";
         List<Credito> output = repository.findByNumeroNfse(input);
         assertThatThrownBy(() -> useCase.executar(input))
-                .isInstanceOf(RuntimeException.class)
+                .isInstanceOf(NotFoundException.class)
                 .hasMessageContaining("Nenhum crédito encontrado para a nota fiscal: " + input);
     }
 

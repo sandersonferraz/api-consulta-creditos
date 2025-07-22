@@ -4,6 +4,7 @@ import com.desafio.credito_api.domain.model.Credito;
 import com.desafio.credito_api.domain.usecase.BuscarCreditoPorNumeroCreditoUseCase;
 import com.desafio.credito_api.infrastructure.repository.CreditoRepository;
 import com.desafio.credito_api.web.dto.CreditoResponseDTO;
+import com.desafio.credito_api.web.exception.NotFoundException;
 import com.desafio.credito_api.web.mapper.CreditoMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -17,7 +18,7 @@ public class BuscarCreditoPorNumeroCreditoUseCaseImpl implements BuscarCreditoPo
     @Override
     public CreditoResponseDTO executar(String numeroCredito) {
         Credito credito = repository.findByNumeroCredito(numeroCredito)
-                .orElseThrow(() -> new RuntimeException("Crédito constituído não encontrado: " + numeroCredito));
+                .orElseThrow(() -> new NotFoundException("Crédito constituído não encontrado: " + numeroCredito));
         return CreditoMapper.INSTANCE.toResponse(credito);
     }
 }

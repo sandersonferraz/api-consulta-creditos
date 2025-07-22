@@ -4,6 +4,7 @@ import com.desafio.credito_api.domain.model.Credito;
 import com.desafio.credito_api.domain.usecase.BuscarCreditosPorNumeroNfseUseCase;
 import com.desafio.credito_api.infrastructure.repository.CreditoRepository;
 import com.desafio.credito_api.web.dto.CreditoResponseDTO;
+import com.desafio.credito_api.web.exception.NotFoundException;
 import com.desafio.credito_api.web.mapper.CreditoMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -19,7 +20,7 @@ public class BuscarCreditosPorNumeroNfseUseCaseImpl implements BuscarCreditosPor
     @Override
     public List<CreditoResponseDTO> executar(String numeroNfse) {
         List<Credito> creditoList = repository.findByNumeroNfse(numeroNfse);
-        if (creditoList.isEmpty()) throw new RuntimeException("Nenhum crédito encontrado para a nota fiscal: " + numeroNfse);
+        if (creditoList.isEmpty()) throw new NotFoundException("Nenhum crédito encontrado para a nota fiscal: " + numeroNfse);
         return CreditoMapper.INSTANCE.toResponseList(creditoList);
     }
 }

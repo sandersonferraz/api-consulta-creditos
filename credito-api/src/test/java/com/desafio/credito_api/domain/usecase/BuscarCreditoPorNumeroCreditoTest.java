@@ -4,6 +4,7 @@ import com.desafio.credito_api.application.usecase.BuscarCreditoPorNumeroCredito
 import com.desafio.credito_api.domain.model.Credito;
 import com.desafio.credito_api.infrastructure.repository.CreditoRepository;
 import com.desafio.credito_api.web.dto.CreditoResponseDTO;
+import com.desafio.credito_api.web.exception.NotFoundException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -64,7 +65,7 @@ public class BuscarCreditoPorNumeroCreditoTest {
         String input = "00000";
         when(repository.findByNumeroCredito(input)).thenReturn(Optional.empty());
         assertThatThrownBy(() -> useCase.executar(input))
-                .isInstanceOf(RuntimeException.class)
+                .isInstanceOf(NotFoundException.class)
                 .hasMessage("Crédito constituído não encontrado: " + input);
     }
 
