@@ -5,4 +5,6 @@ public class BusinessException  extends RuntimeException {
     public BusinessException(String messsage, Throwable cause) {
         super(messsage, cause);
     }
+
+
 }
