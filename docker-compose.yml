@@ -8,14 +8,19 @@ services:
       POSTGRES_DB: ${DB_NAME}
       POSTGRES_USER: ${DB_USER}
       POSTGRES_PASSWORD: ${DB_PASS}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
     networks:
-        - app-network
-  
+      - app-network
+
   zookeeper:
     image: confluentinc/cp-zookeeper:7.4.0
     container_name: zookeeper
     environment:
       ZOOKEEPER_CLIENT_PORT: 2181
+    volumes:
+      - zkdata:/var/lib/zookeeper/data
+      - zklog:/var/lib/zookeeper/log
     networks:
       - app-network
 
@@ -27,13 +32,31 @@ services:
     environment:
       KAFKA_BROKER_ID: 1
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
-      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INTERNAL:PLAINTEXT,EXTERNAL:PLAINTEXT
-      KAFKA_LISTENERS: INTERNAL://kafka:29092,EXTERNAL://0.0.0.0:9092
-      KAFKA_ADVERTISED_LISTENERS: INTERNAL://kafka:29092,EXTERNAL://localhost:9092
-      KAFKA_INTER_BROKER_LISTENER_NAME: INTERNAL
+      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
     depends_on:
       - zookeeper
+    volumes:
+      - kafkadata:/var/lib/kafka/data
+    networks:
+      - app-network
+  
+  create-topics:
+    image: confluentinc/cp-kafka:7.4.0
+    container_name: create_topics
+    depends_on:
+      - kafka
+    entrypoint:
+      - /bin/sh
+      - -c
+      - |
+        echo "Esperando Kafka iniciar..."
+        sleep 20
+        echo "Criando tópico credit-event..."
+        kafka-topics --create --topic credit-event --partitions 1 --replication-factor 1 --if-not-exists --bootstrap-server kafka:9092
+        echo "Tópico criado, terminando."
+    restart: "no"
     networks:
       - app-network
 
@@ -44,7 +67,7 @@ services:
       - "8081:8080"
     environment:
       - KAFKA_CLUSTERS_0_NAME=local
-      - KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS=kafka:29092
+      - KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS=kafka:9092
       - KAFKA_CLUSTERS_0_ZOOKEEPER=zookeeper:2181
     depends_on:
       - kafka
@@ -52,26 +75,35 @@ services:
       - app-network
 
   credito-api:
-      build:
-        context: ./credito-api
-        dockerfile: Dockerfile
-      container_name: credito-api
-      depends_on:
-        - db
-        - kafka
-        - zookeeper
-      environment:
-        DB_HOST: db
-        DB_PORT: ${DB_PORT}
-        DB_NAME: ${DB_NAME}
-        DB_USER: ${DB_USER}
-        DB_PASS: ${DB_PASS}
-        DB_SCHEMA: public
-      ports:
-        - "8080:8080"
-      networks:
-        - app-network
+    build:
+      context: ./credito-api
+      dockerfile: Dockerfile
+    container_name: credito-api
+    depends_on:
+      - db
+      - kafka
+      - zookeeper
+    environment:
+      DB_HOST: db
+      DB_PORT: ${DB_PORT}
+      DB_NAME: ${DB_NAME}
+      DB_USER: ${DB_USER}
+      DB_PASS: ${DB_PASS}
+      DB_SCHEMA: public
+    ports:
+      - "8080:8080"
+    volumes:
+      - .env:/app/.env
+    networks:
+      - app-network
 
 networks:
   app-network:
     driver: bridge
+
+volumes:
+  pgdata:
+  zkdata:
+  zklog:
+  kafkadata:
+
