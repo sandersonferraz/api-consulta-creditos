@@ -2,6 +2,7 @@ package com.desafio.credito_api.domain.usecase;
 
 import com.desafio.credito_api.application.usecase.BuscarCreditoPorNumeroCreditoUseCaseImpl;
 import com.desafio.credito_api.domain.model.Credito;
+import com.desafio.credito_api.infrastructure.kafka.KafkaProducer;
 import com.desafio.credito_api.infrastructure.repository.CreditoRepository;
 import com.desafio.credito_api.web.dto.CreditoResponseDTO;
 import com.desafio.credito_api.web.exception.NotFoundException;
@@ -21,8 +22,12 @@ import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 public class BuscarCreditoPorNumeroCreditoTest {
+
     @Mock
     private CreditoRepository repository;
+
+    @Mock
+    private KafkaProducer kafkaProducer;
 
     @InjectMocks
     private BuscarCreditoPorNumeroCreditoUseCaseImpl useCase;
