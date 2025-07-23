@@ -51,7 +51,27 @@ spring:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.apache.kafka.common.serialization.StringSerializer
 
+springdoc:
+  api-docs:
+    path: /api-docs
+  swagger-ui:
+    path: /swagger-ui.html
 
 logging:
   level:
     root: INFO
+
+management:
+  server:
+    port: 8080
+  endpoints:
+    web:
+      exposure:
+        include:  "*"
+  endpoint:
+    health:
+      show-details: always
+
+info:
+  app: Credito API
+  web: http://localhost:8080/api/creaditos
