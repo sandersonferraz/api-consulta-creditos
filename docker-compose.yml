@@ -8,8 +8,6 @@ services:
       POSTGRES_DB: ${DB_NAME}
       POSTGRES_USER: ${DB_USER}
       POSTGRES_PASSWORD: ${DB_PASS}
-    volumes:
-      - pgdata:/var/lib/postgresql/data
     networks:
       - app-network
 
@@ -18,9 +16,6 @@ services:
     container_name: zookeeper
     environment:
       ZOOKEEPER_CLIENT_PORT: 2181
-    volumes:
-      - zkdata:/var/lib/zookeeper/data
-      - zklog:/var/lib/zookeeper/log
     networks:
       - app-network
 
@@ -37,8 +32,6 @@ services:
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
     depends_on:
       - zookeeper
-    volumes:
-      - kafkadata:/var/lib/kafka/data
     networks:
       - app-network
   
@@ -51,11 +44,8 @@ services:
       - /bin/sh
       - -c
       - |
-        echo "Esperando Kafka iniciar..."
         sleep 20
-        echo "Criando tópico credit-event..."
-        kafka-topics --create --topic credit-event --partitions 1 --replication-factor 1 --if-not-exists --bootstrap-server kafka:9092
-        echo "Tópico criado, terminando."
+        kafka-topics --create --topic credit-events --partitions 1 --replication-factor 1 --if-not-exists --bootstrap-server kafka:9092
     restart: "no"
     networks:
       - app-network
@@ -97,13 +87,18 @@ services:
     networks:
       - app-network
 
+  credito-front:
+    build:
+      context: ./credito-front
+      dockerfile: Dockerfile
+    container_name: credito-front
+    ports:
+      - "4200:4200" 
+    depends_on:
+      - credito-api
+    networks:
+      - app-network
+
 networks:
   app-network:
     driver: bridge
-
-volumes:
-  pgdata:
-  zkdata:
-  zklog:
-  kafkadata:
-
