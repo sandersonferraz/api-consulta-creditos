@@ -1,2 +1,8 @@
 .env
 .idea
+.vscode
+node_modules
+dist
+tmp
+out-tsc
+bazel-out
